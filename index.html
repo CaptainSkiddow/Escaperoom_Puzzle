@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rebus is cool</title>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+    <div id="video-container">
+        <h2>Webcam Feed</h2>
+        <video id="video" width="640" height="480" autoplay playsinline></video>
+    </div>
+
+    <div id="canvas-container">
+        <h2>Canvas Output</h2>
+        <canvas id="canvas" width="640" height="480"></canvas>
+    </div>
+
+    <div>
+        <button id="startBtn">Start Webcam</button>
+        <button id="stopBtn" disabled>Stop Webcam</button>
+    </div>
+
+    <p id="errorMsg"></p>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
