@@ -66,11 +66,6 @@ function stopWebcam() {
 function drawToCanvas() {
     // Draw the current frame from video to canvas
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    // draw a circle on the canvas
-    ctx.beginPath();
-    ctx.arc(100, 75, 50, 0, 2 * Math.PI);
-    ctx.stroke();
-    ctx.closePath();
 
     // calculate how many red pixels are in the video
     let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -86,6 +81,9 @@ function drawToCanvas() {
     // }
 
     //console.log('Red pixels:', redPixels);
+
+    const srgbImageData = context.getImageData(0, 0, 1, 1, { colorSpace: "srgb" });
+    console.log(srgbImageData.colorSpace); // "srgb"
 
     // Request the next frame if the stream is still active
     if (stream && stream.active) {
