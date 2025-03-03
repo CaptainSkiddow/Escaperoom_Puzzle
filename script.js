@@ -82,7 +82,7 @@ function drawToCanvas() {
 
     //console.log('Red pixels:', redPixels);
 
-    const srgbImageData = context.getImageData(0, 0, 1, 1, { colorSpace: "srgb" });
+    const srgbImageData = canvas.getImageData(0, 0, 1, 1, { colorSpace: "srgb" });
     console.log(srgbImageData.colorSpace); // "srgb"
 
     // Request the next frame if the stream is still active
