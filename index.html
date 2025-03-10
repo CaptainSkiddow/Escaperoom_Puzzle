@@ -4,28 +4,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rebus is cool</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Webcam Red Pixel Counter</title>
+    <link rel="stylesheet" href="styles.css">
 
 </head>
 
 <body>
-    <div id="video-container">
-        <h2>Webcam Feed</h2>
-        <video id="video" width="640" height="480" autoplay playsinline></video>
-    </div>
+    <div class="container">
+        <h1>Webcam Red Pixel Counter</h1>
 
-    <div id="canvas-container">
-        <h2>Canvas Output</h2>
-        <canvas id="canvas" width="640" height="480"></canvas>
-    </div>
+        <div class="video-container">
+            <video id="video" autoplay playsinline></video>
+            <canvas id="debug-canvas"></canvas>
+        </div>
 
-    <div>
-        <button id="startBtn">Start Webcam</button>
-        <button id="stopBtn" disabled>Stop Webcam</button>
-    </div>
+        <canvas id="canvas"></canvas>
 
-    <p id="errorMsg"></p>
+        <div class="stats">
+            <div class="stat-row">
+                <strong>Red Pixels:</strong> <span id="red-pixel-count">0</span>
+            </div>
+            <div class="stat-row">
+                <strong>Total Pixels:</strong> <span id="total-pixels">0</span>
+            </div>
+            <div class="stat-row">
+                <strong>Percentage Red:</strong> <span id="red-percentage">0%</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="threshold-control">
+                <label for="red-threshold">Minimum Red Value (0-255):</label>
+                <input type="range" id="red-threshold" min="0" max="255" value="150">
+                <span id="red-threshold-value">150</span>
+            </div>
+            <div class="threshold-control">
+                <label for="ratio-threshold">Red/Green Ratio Threshold:</label>
+                <input type="range" id="ratio-threshold" min="1" max="3" step="0.1" value="1.5">
+                <span id="ratio-threshold-value">1.5</span>
+            </div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>

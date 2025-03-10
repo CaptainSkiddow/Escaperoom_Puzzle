@@ -1,96 +1,136 @@
-// DOM elements
-const video = document.getElementById('video');
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-const startBtn = document.getElementById('startBtn');
-const stopBtn = document.getElementById('stopBtn');
-const errorMsg = document.getElementById('errorMsg');
+document.addEventListener('DOMContentLoaded', () => {
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const debugCanvas = document.getElementById('debug-canvas');
+    const ctx = canvas.getContext('2d');
+    const debugCtx = debugCanvas.getContext('2d');
 
-// Video stream variable
-let stream = null;
+    const redPixelCountElement = document.getElementById('red-pixel-count');
+    const totalPixelsElement = document.getElementById('total-pixels');
+    const redPercentageElement = document.getElementById('red-percentage');
 
-// Animation frame ID for drawing
-let animationId = null;
+    const redThresholdSlider = document.getElementById('red-threshold');
+    const redThresholdValue = document.getElementById('red-threshold-value');
+    const ratioThresholdSlider = document.getElementById('ratio-threshold');
+    const ratioThresholdValue = document.getElementById('ratio-threshold-value');
 
-// Function to start the webcam
-function startWebcam() {
-    // Request access to the webcam
-    navigator.mediaDevices.getUserMedia({ video: true })
-        .then(function (mediaStream) {
-            // Store the stream for later stopping
-            stream = mediaStream;
+    // Configure video and canvas
+    video.width = 640;
+    video.height = 480;
+    canvas.width = video.width;
+    canvas.height = video.height;
+    debugCanvas.width = 160;
+    debugCanvas.height = 120;
 
-            // Connect the stream to the video element
-            video.srcObject = mediaStream;
-            video.onloadedmetadata = function (e) {
-                video.play();
-                // Start drawing to canvas once video is playing
-                drawToCanvas();
-            };
+    // Initialize values
+    let redPixelCount = 0;
+    let totalPixels = 0;
+    let redRatio = 0;
+    let redThreshold = 150;
+    let ratioThreshold = 1.5;
 
-            // Update button states
-            startBtn.disabled = true;
-            stopBtn.disabled = false;
-            errorMsg.textContent = '';
-        })
-        .catch(function (err) {
-            errorMsg.textContent = 'Error accessing webcam: ' + err.message;
-            console.error('Error accessing webcam:', err);
-        });
-}
+    // Update threshold displays
+    redThresholdSlider.addEventListener('input', () => {
+        redThreshold = parseInt(redThresholdSlider.value);
+        redThresholdValue.textContent = redThreshold;
+    });
 
-// Function to stop the webcam
-function stopWebcam() {
-    if (stream) {
-        // Stop all tracks in the stream
-        stream.getTracks().forEach(track => track.stop());
-        video.srcObject = null;
-        stream = null;
+    ratioThresholdSlider.addEventListener('input', () => {
+        ratioThreshold = parseFloat(ratioThresholdSlider.value);
+        ratioThresholdValue.textContent = ratioThreshold;
+    });
 
-        // Cancel the animation frame
-        if (animationId) {
-            cancelAnimationFrame(animationId);
-            animationId = null;
+    // Function to determine if a pixel is red
+    function isRedPixel(r, g, b) {
+        return r > redThreshold && r > g * ratioThreshold && r > b * ratioThreshold;
+    }
+
+    // Function to analyze the current video frame
+    function analyzeFrame() {
+        // Draw current video frame to canvas
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Get image data
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const pixels = imageData.data;
+
+        // Create debug image data
+        const debugImageData = debugCtx.createImageData(debugCanvas.width, debugCanvas.height);
+        const debugPixels = debugImageData.data;
+
+        // Reset counters
+        redPixelCount = 0;
+        totalPixels = (canvas.width * canvas.height);
+
+        // Sample rate for debug view (show 1 out of every X pixels)
+        const sampleRate = video.width / debugCanvas.width;
+
+        // Count red pixels
+        for (let y = 0; y < canvas.height; y++) {
+            for (let x = 0; x < canvas.width; x++) {
+                const i = (y * canvas.width + x) * 4;
+                const r = pixels[i];
+                const g = pixels[i + 1];
+                const b = pixels[i + 2];
+
+                // Check if this is a red pixel
+                const isRed = isRedPixel(r, g, b);
+                if (isRed) {
+                    redPixelCount++;
+                }
+
+                // Update debug view (downsampled)
+                if (x % sampleRate < 1 && y % sampleRate < 1) {
+                    const debugX = Math.floor(x / sampleRate);
+                    const debugY = Math.floor(y / sampleRate);
+                    const debugI = (debugY * debugCanvas.width + debugX) * 4;
+
+                    if (isRed) {
+                        // Highlight red pixels in bright red
+                        debugPixels[debugI] = 255;     // R
+                        debugPixels[debugI + 1] = 0;   // G
+                        debugPixels[debugI + 2] = 0;   // B
+                        debugPixels[debugI + 3] = 255; // A
+                    } else {
+                        // Show other pixels in grayscale
+                        const gray = (r + g + b) / 3;
+                        debugPixels[debugI] = gray;
+                        debugPixels[debugI + 1] = gray;
+                        debugPixels[debugI + 2] = gray;
+                        debugPixels[debugI + 3] = 255;
+                    }
+                }
+            }
         }
 
-        // Clear the canvas
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Update debug canvas
+        debugCtx.putImageData(debugImageData, 0, 0);
 
-        // Update button states
-        startBtn.disabled = false;
-        stopBtn.disabled = true;
+        // Calculate ratio
+        redRatio = redPixelCount / totalPixels;
+
+        // Update display
+        redPixelCountElement.textContent = redPixelCount.toLocaleString();
+        totalPixelsElement.textContent = totalPixels.toLocaleString();
+        redPercentageElement.textContent = (redRatio * 100).toFixed(2) + '%';
+
+        // Continue analyzing frames
+        requestAnimationFrame(analyzeFrame);
     }
-}
 
-// Function to draw video to canvas
-function drawToCanvas() {
-    // Draw the current frame from video to canvas
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    // Start webcam
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then((stream) => {
+            video.srcObject = stream;
+            video.play();
 
-    // calculate how many red pixels are in the video
-    let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-    //console.log(imageData.data[0]);
-    console.log(imageData.data[1]);
-
-    // let redPixels = 0;
-    // for (let i = 0; i < imageData.data.length; i += 4) {
-    //   if (imageData.data[i] > 200 && imageData.data[i + 1] < 100 && imageData.data[i + 2] < 100) {
-    //     redPixels++;
-    //   }
-    // }
-
-    //console.log('Red pixels:', redPixels);
-
-    const srgbImageData = canvas.getImageData(0, 0, 1, 1, { colorSpace: "srgb" });
-    console.log(srgbImageData.colorSpace); // "srgb"
-
-    // Request the next frame if the stream is still active
-    if (stream && stream.active) {
-        animationId = requestAnimationFrame(drawToCanvas);
-    }
-}
-
-// Event listeners for buttons
-startBtn.addEventListener('click', startWebcam);
-stopBtn.addEventListener('click', stopWebcam);
+            // Start analyzing once video is playing
+            video.onloadedmetadata = () => {
+                analyzeFrame();
+            };
+        })
+        .catch((error) => {
+            console.error('Error accessing webcam:', error);
+            alert('Error accessing webcam: ' + error.message);
+        });
+});
