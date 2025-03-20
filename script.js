@@ -14,6 +14,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const ratioThresholdSlider = document.getElementById('ratio-threshold');
     const ratioThresholdValue = document.getElementById('ratio-threshold-value');
 
+    // Get the progress bar element
+    const progressBar = document.getElementById('progress-bar');
+
     // Configure video and canvas
     video.width = 640;
     video.height = 480;
@@ -113,6 +116,9 @@ document.addEventListener('DOMContentLoaded', () => {
         redPixelCountElement.textContent = redPixelCount.toLocaleString();
         totalPixelsElement.textContent = totalPixels.toLocaleString();
         redPercentageElement.textContent = (redRatio * 100).toFixed(2) + '%';
+
+        // Update progress bar width
+        progressBar.style.width = (redRatio * 100).toFixed(2) + '%';
 
         // Continue analyzing frames
         requestAnimationFrame(analyzeFrame);
