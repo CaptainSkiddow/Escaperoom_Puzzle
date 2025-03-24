@@ -17,6 +17,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Get the progress bar element
     const progressBar = document.getElementById('progress-bar');
 
+    // Add elements for blue pixel count and percentage
+    const bluePixelCountElement = document.getElementById('blue-pixel-count');
+    const bluePercentageElement = document.getElementById('blue-percentage');
+
     // Configure video and canvas
     video.width = 640;
     video.height = 480;
@@ -46,6 +50,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to determine if a pixel is red
     function isRedPixel(r, g, b) {
         return r > redThreshold && r > g * ratioThreshold && r > b * ratioThreshold;
+    }
+
+    // Function to determine if a pixel is blue
+    function isBluePixel(r, g, b) {
+        return b > redThreshold && b > r * ratioThreshold && b > g * ratioThreshold;
     }
 
     // Function to analyze the current video frame
@@ -120,8 +129,47 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update progress bar width
         progressBar.style.width = (redRatio * 100).toFixed(2) + '%';
 
+        // Trigger blue pixel check if redRatio exceeds 90%
+        if (redRatio > 0.7) {
+            checkBluePixels();
+        }
+
         // Continue analyzing frames
         requestAnimationFrame(analyzeFrame);
+    }
+
+    // Function to check blue pixels
+    function checkBluePixels() {
+        let bluePixelCount = 0;
+
+        // Get image data again
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const pixels = imageData.data;
+
+        // Count blue pixels
+        for (let y = 0; y < canvas.height; y++) {
+            for (let x = 0; x < canvas.width; x++) {
+                const i = (y * canvas.width + x) * 4;
+                const r = pixels[i];
+                const g = pixels[i + 1];
+                const b = pixels[i + 2];
+
+                if (isBluePixel(r, g, b)) {
+                    bluePixelCount++;
+                }
+            }
+        }
+
+        // Calculate blue ratio
+        const blueRatio = bluePixelCount / totalPixels;
+
+        // Update UI with blue pixel count and percentage
+        bluePixelCountElement.textContent = bluePixelCount.toLocaleString();
+        bluePercentageElement.textContent = (blueRatio * 100).toFixed(2) + '%';
+
+        // Log blue pixel data (optional)
+        console.log(`Blue Pixels: ${bluePixelCount}`);
+        console.log(`Blue Ratio: ${(blueRatio * 100).toFixed(2)}%`);
     }
 
     // Start webcam
