@@ -21,6 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const bluePixelCountElement = document.getElementById('blue-pixel-count');
     const bluePercentageElement = document.getElementById('blue-percentage');
 
+    // Get the blue progress bar element
+    const blueProgressBar = document.getElementById('blue-progress-bar');
+
     // Configure video and canvas
     video.width = 640;
     video.height = 480;
@@ -166,6 +169,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update UI with blue pixel count and percentage
         bluePixelCountElement.textContent = bluePixelCount.toLocaleString();
         bluePercentageElement.textContent = (blueRatio * 100).toFixed(2) + '%';
+
+        // Update blue progress bar width
+        blueProgressBar.style.width = (blueRatio * 100).toFixed(2) + '%';
 
         // Log blue pixel data (optional)
         console.log(`Blue Pixels: ${bluePixelCount}`);
