@@ -5,8 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webcam Red Pixel Counter</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://unpkg.com/xp.css">
+    <link rel="stylesheet" href="style.css">
 
 </head>
 
@@ -31,30 +30,34 @@
             <div class="stat-row">
                 <strong>Percentage Red:</strong> <span id="red-percentage">0%</span>
             </div>
+            <div class="stat-row">
+                <strong>Blue Pixels:</strong> <span id="blue-pixel-count">0</span>
+            </div>
+            <div class="stat-row">
+                <strong>Percentage Blue:</strong> <span id="blue-percentage">0%</span>
+            </div>
+            <div class="stat-row">
+                <strong>Green Pixels:</strong> <span id="green-pixel-count">0</span>
+            </div>
+            <div class="stat-row">
+                <strong>Percentage Green:</strong> <span id="green-percentage">0%</span>
+            </div>
         </div>
 
-        <div id="progress-bar-container"
-            style="width: 100%; background-color: #ddd; height: 20px; border-radius: 5px; margin-top: 10px;">
-            <div id="progress-bar" style="width: 0%; height: 100%; background-color: red; border-radius: 5px;"></div>
+        <div id="progress-bar-container" style="width: 100%; background-color: #ddd; height: 20px; margin-top: 10px;">
+            <div id="progress-bar" style="width: 0%; height: 100%; background-color: red;"></div>
         </div>
 
         <div id="blue-progress-bar-container"
-            style="width: 100%; background-color: #ddd; height: 20px; border-radius: 5px; margin-top: 10px;">
-            <div id="blue-progress-bar" style="width: 0%; height: 100%; background-color: blue; border-radius: 5px;">
+            style="width: 100%; background-color: #ddd; height: 20px; margin-top: 10px;">
+            <div id="blue-progress-bar" style="width: 0%; height: 100%; background-color: blue;">
             </div>
         </div>
+        <div id="green-progress-bar-container"
+            style="width: 100%; background-color: #ddd; height: 20px; margin-top: 10px;">
+            <div id="green-progress-bar" style="width: 0%; height: 100%; background-color: green;">
+            </div>
 
-        <div class="controls">
-            <div class="threshold-control">
-                <label for="red-threshold">Minimum Red Value (0-255):</label>
-                <input type="range" id="red-threshold" min="0" max="255" value="150">
-                <span id="red-threshold-value">150</span>
-            </div>
-            <div class="threshold-control">
-                <label for="ratio-threshold">Red/Green Ratio Threshold:</label>
-                <input type="range" id="ratio-threshold" min="1" max="3" step="0.1" value="1.5">
-                <span id="ratio-threshold-value">1.5</span>
-            </div>
         </div>
     </div>
 

@@ -9,11 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalPixelsElement = document.getElementById('total-pixels');
     const redPercentageElement = document.getElementById('red-percentage');
 
-    const redThresholdSlider = document.getElementById('red-threshold');
-    const redThresholdValue = document.getElementById('red-threshold-value');
-    const ratioThresholdSlider = document.getElementById('ratio-threshold');
-    const ratioThresholdValue = document.getElementById('ratio-threshold-value');
-
     // Get the progress bar element
     const progressBar = document.getElementById('progress-bar');
 
@@ -23,6 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Get the blue progress bar element
     const blueProgressBar = document.getElementById('blue-progress-bar');
+
+    const greenPixelCountElement = document.getElementById('green-pixel-count');
+    const greenPercentageElement = document.getElementById('green-percentage');
 
     // Configure video and canvas
     video.width = 640;
@@ -39,16 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let redThreshold = 150;
     let ratioThreshold = 1.5;
 
-    // Update threshold displays
-    redThresholdSlider.addEventListener('input', () => {
-        redThreshold = parseInt(redThresholdSlider.value);
-        redThresholdValue.textContent = redThreshold;
-    });
-
-    ratioThresholdSlider.addEventListener('input', () => {
-        ratioThreshold = parseFloat(ratioThresholdSlider.value);
-        ratioThresholdValue.textContent = ratioThreshold;
-    });
 
     // Function to determine if a pixel is red
     function isRedPixel(r, g, b) {
@@ -58,6 +46,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to determine if a pixel is blue
     function isBluePixel(r, g, b) {
         return b > redThreshold && b > r * ratioThreshold && b > g * ratioThreshold;
+    }
+
+    // Function to determine if a pixel is green
+    function isGreenPixel(r, g, b) {
+        return g > redThreshold && g > r * ratioThreshold && g > b * ratioThreshold;
     }
 
     // Function to analyze the current video frame
@@ -134,8 +127,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Trigger blue pixel check if redRatio exceeds 90%
         if (redRatio > 0.7) {
-            checkBluePixels();
+            // een if functie om de hoeveelheid blauw-ratio te verifieren, en daarna groen te analyseren. 
+
+
+
         }
+
+        checkBluePixels();
+        checkGreenPixels();
 
         // Continue analyzing frames
         requestAnimationFrame(analyzeFrame);
@@ -174,8 +173,41 @@ document.addEventListener('DOMContentLoaded', () => {
         blueProgressBar.style.width = (blueRatio * 100).toFixed(2) + '%';
 
         // Log blue pixel data (optional)
-        console.log(`Blue Pixels: ${bluePixelCount}`);
-        console.log(`Blue Ratio: ${(blueRatio * 100).toFixed(2)}%`);
+        //console.log(`Blue Pixels: ${bluePixelCount}`);
+        //console.log(`Blue Ratio: ${(blueRatio * 100).toFixed(2)}%`);
+    }
+
+    // Function to check green pixels
+    function checkGreenPixels() {
+        let greenPixelCount = 0;
+
+        // Get image data again
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const pixels = imageData.data;
+
+        // Count green pixels
+        for (let y = 0; y < canvas.height; y++) {
+            for (let x = 0; x < canvas.width; x++) {
+                const i = (y * canvas.width + x) * 4;
+                const r = pixels[i];
+                const g = pixels[i + 1];
+                const b = pixels[i + 2];
+
+                if (isGreenPixel(r, g, b)) {
+                    greenPixelCount++;
+                    console.log(greenPixelCount);
+                }
+
+            }
+        }
+
+        // Calculate green ratio
+        const greenRatio = greenPixelCount / totalPixels;
+
+        // Update UI with green pixel count and percentage
+        greenPixelCountElement.textContent = greenPixelCount.toLocaleString();
+        greenPercentageElement.textContent = (greenRatio * 100).toFixed(2) + '%';
+
     }
 
     // Start webcam
@@ -194,3 +226,6 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Error accessing webcam: ' + error.message);
         });
 });
+
+
+
