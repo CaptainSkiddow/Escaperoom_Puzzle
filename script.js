@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         debugPixels[debugI] = 255;     // R
                         debugPixels[debugI + 1] = 0;   // G
                         debugPixels[debugI + 2] = 0;   // B
-                        debugPixels[debugI + 3] = 255; // A
+                        debugPixels[debugI + 3] = 0; // A
                     } else {
                         // Show other pixels in grayscale
                         const gray = (r + g + b) / 3;
