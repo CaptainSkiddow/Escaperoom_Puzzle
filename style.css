@@ -85,3 +85,24 @@ label {
     background-color: red;
     border-radius: 5px
 }
+
+.xp_progressbar {
+    width: 100%;
+    background-color: #ddd;
+    height: 2rem;
+    border-radius: 2px;
+    overflow: hidden; /* Ensure the entire progress bar hides overflow */
+}
+
+.xp_progressbar_inner {
+    width: 60%;
+    overflow: hidden; /* Hide the overflowing part of the boxes */
+}
+
+.box_green {
+    width: 16px; /* Fixed width for each box */
+    height: 32px; /* Fixed height for each box */
+    background-color: green; /* Ensure the color is visible */
+    display: inline-block; /* Display them side by side */
+    margin-right: 2px; /* Add spacing between boxes */
+}
