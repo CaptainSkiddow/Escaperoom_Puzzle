@@ -9,20 +9,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalPixelsElement = document.getElementById('total-pixels');
     const redPercentageElement = document.getElementById('red-percentage');
 
-    // Get the progress bar element
     const progressBar = document.getElementById('progress-bar');
 
-    // Add elements for blue pixel count and percentage
     const bluePixelCountElement = document.getElementById('blue-pixel-count');
     const bluePercentageElement = document.getElementById('blue-percentage');
 
-    // Get the blue progress bar element
     const blueProgressBar = document.getElementById('blue-progress-bar');
 
     const greenPixelCountElement = document.getElementById('green-pixel-count');
     const greenPercentageElement = document.getElementById('green-percentage');
 
-    // Configure video and canvas
+    const XpProgressBar = document.getElementsByClassName('xp_progressbar_inner');
+
+    let currentRatio;
+
     video.width = 640;
     video.height = 480;
     canvas.width = video.width;
@@ -30,7 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
     debugCanvas.width = 160;
     debugCanvas.height = 120;
 
-    // Initialize values
     let redPixelCount = 0;
     let totalPixels = 0;
     let redRatio = 0;
@@ -53,7 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return g > redThreshold && g > r * ratioThreshold && g > b * ratioThreshold;
     }
 
-    // Function to analyze the current video frame
     function analyzeFrame() {
         // Draw current video frame to canvas
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -111,21 +109,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Update debug canvas
         debugCtx.putImageData(debugImageData, 0, 0);
 
-        // Calculate ratio
         redRatio = redPixelCount / totalPixels;
 
-        // Update display
         redPixelCountElement.textContent = redPixelCount.toLocaleString();
         totalPixelsElement.textContent = totalPixels.toLocaleString();
         redPercentageElement.textContent = (redRatio * 100).toFixed(2) + '%';
 
-        // Update progress bar width
         progressBar.style.width = (redRatio * 100).toFixed(2) + '%';
+        currentRatio = (redRatio);
 
-        // Trigger blue pixel check if redRatio exceeds 90%
+
         if (redRatio > 0.7) {
             // een if functie om de hoeveelheid blauw-ratio te verifieren, en daarna groen te analyseren. 
 
@@ -136,11 +131,9 @@ document.addEventListener('DOMContentLoaded', () => {
         checkBluePixels();
         checkGreenPixels();
 
-        // Continue analyzing frames
         requestAnimationFrame(analyzeFrame);
     }
 
-    // Function to check blue pixels
     function checkBluePixels() {
         let bluePixelCount = 0;
 
@@ -210,13 +203,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     }
 
-    // Start webcam
     navigator.mediaDevices.getUserMedia({ video: true })
         .then((stream) => {
             video.srcObject = stream;
             video.play();
 
-            // Start analyzing once video is playing
             video.onloadedmetadata = () => {
                 analyzeFrame();
             };
@@ -226,6 +217,14 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Error accessing webcam: ' + error.message);
         });
 });
+
+function updateXpBar() {
+    XpProgressBar.style.width = (currentRatio * 100).toFixed(2) + '%';
+}
+
+updateXpBar();
+
+
 
 
 

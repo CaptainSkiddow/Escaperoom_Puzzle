@@ -95,11 +95,13 @@ label {
 }
 
 .xp_progressbar_inner {
-    width: 60%;
+    display: flex; /* Use flexbox for layout */
+    align-items: center;
     overflow: hidden; /* Hide the overflowing part of the boxes */
 }
 
 .box_green {
+    flex-shrink: 0; /* Prevent shrinking */
     width: 16px; /* Fixed width for each box */
     height: 32px; /* Fixed height for each box */
     background-color: green; /* Ensure the color is visible */
