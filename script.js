@@ -13,11 +13,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const bluePixelCountElement = document.getElementById("blue-pixel-count");
   const bluePercentageElement = document.getElementById("blue-percentage");
-
   const blueProgressBar = document.getElementById("blue-progress-bar");
 
   const greenPixelCountElement = document.getElementById("green-pixel-count");
   const greenPercentageElement = document.getElementById("green-percentage");
+  const greenProgressBar = document.getElementById("green-progress-bar");
 
   const XpProgressBar = document.getElementsByClassName("xp_progressbar_inner");
 
@@ -35,7 +35,10 @@ document.addEventListener("DOMContentLoaded", () => {
   let redRatio = 0;
   let redThreshold = 150;
   let ratioThreshold = 1.5;
-  let blueThreshold = 150; // Define a threshold for blue detection
+  let blueThreshold = 100; // Define a threshold for blue detection
+  let bluePixelCount = 0;
+  let greenPixelCount = 0;
+  let greenThreshold = 100; // Define a threshold for green detection
 
   // Function to determine if a pixel is red
   function isRedPixel(r, g, b) {
@@ -51,7 +54,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Function to determine if a pixel is green
   function isGreenPixel(r, g, b) {
-    return g > redThreshold && g > r * ratioThreshold && g > b * ratioThreshold;
+    return (
+      g > greenThreshold && g > r * ratioThreshold && g > b * ratioThreshold
+    );
   }
 
   function analyzeFrame() {
@@ -69,14 +74,15 @@ document.addEventListener("DOMContentLoaded", () => {
     );
     const debugPixels = debugImageData.data;
 
-    // Reset counters
     redPixelCount = 0;
+    bluePixelCount = 0;
+    greenPixelCount = 0;
     totalPixels = canvas.width * canvas.height;
 
-    // Sample rate for debug view (show 1 out of every X pixels)
+    currentRatio = redRatio;
+
     const sampleRate = video.width / debugCanvas.width;
 
-    // Count red pixels
     for (let y = 0; y < canvas.height; y++) {
       for (let x = 0; x < canvas.width; x++) {
         const i = (y * canvas.width + x) * 4;
@@ -84,10 +90,19 @@ document.addEventListener("DOMContentLoaded", () => {
         const g = pixels[i + 1];
         const b = pixels[i + 2];
 
-        // Check if this is a red pixel
         const isRed = isRedPixel(r, g, b);
         if (isRed) {
           redPixelCount++;
+        }
+
+        const isBlue = isBluePixel(r, g, b);
+        if (isBlue) {
+          bluePixelCount++;
+        }
+
+        const isGreen = isGreenPixel(r, g, b);
+        if (isGreen) {
+          greenPixelCount++;
         }
 
         // Update debug view (downsampled)
@@ -117,84 +132,95 @@ document.addEventListener("DOMContentLoaded", () => {
     debugCtx.putImageData(debugImageData, 0, 0);
 
     redRatio = redPixelCount / totalPixels;
+    blueRatio = bluePixelCount / totalPixels;
+    greenRatio = greenPixelCount / totalPixels;
 
     redPixelCountElement.textContent = redPixelCount.toLocaleString();
     totalPixelsElement.textContent = totalPixels.toLocaleString();
     redPercentageElement.textContent = (redRatio * 100).toFixed(2) + "%";
-
     progressBar.style.width = (redRatio * 100).toFixed(2) + "%";
-    currentRatio = redRatio;
+
+    bluePixelCountElement.textContent = bluePixelCount.toLocaleString();
+    bluePercentageElement.textContent = (blueRatio * 100).toFixed(2) + "%";
+    blueProgressBar.style.width = (blueRatio * 100).toFixed(2) + "%";
+
+    greenPixelCountElement.textContent = greenPixelCount.toLocaleString();
+    greenPercentageElement.textContent = (greenRatio * 100).toFixed(2) + "%";
+    greenProgressBar.style.width = (greenRatio * 100).toFixed(2) + "%";
 
     requestAnimationFrame(analyzeFrame);
   }
 
-  function checkBluePixels() {
-    let bluePixelCount = 0;
+  //   function checkBluePixels() {
+  //     let bluePixelCount = 0;
 
-    // Get image data
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const pixels = imageData.data;
+  //     // Get image data
+  //     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  //     const pixels = imageData.data;
 
-    // Count blue pixels
-    for (let y = 0; y < canvas.height; y++) {
-      for (let x = 0; x < canvas.width; x++) {
-        const i = (y * canvas.width + x) * 4;
-        const r = pixels[i];
-        const g = pixels[i + 1];
-        const b = pixels[i + 2];
+  //     // Count blue pixels
+  //     for (let y = 0; y < canvas.height; y++) {
+  //       for (let x = 0; x < canvas.width; x++) {
+  //         const i = (y * canvas.width + x) * 4;
+  //         const r = pixels[i];
+  //         const g = pixels[i + 1];
+  //         const b = pixels[i + 2];
 
-        if (isBluePixel(r, g, b)) {
-          bluePixelCount++;
-          console.log(
-            `Blue Pixel Detected at (${x}, ${y}): R=${r}, G=${g}, B=${b}`
-          );
-        }
-      }
-    }
+  //         if (isBluePixel(r, g, b)) {
+  //           bluePixelCount++;
+  //           console.log(
+  //             `Blue Pixel Detected at (${x}, ${y}): R=${r}, G=${g}, B=${b}`
+  //           );
+  //         }
+  //       }
+  //     }
 
-    checkBluePixels();
+  //     // Calculate blue ratio
+  //     const blueRatio = bluePixelCount / totalPixels;
 
-    // Calculate blue ratio
-    const blueRatio = bluePixelCount / totalPixels;
+  //     console.log(
+  //       `Blue Pixel Count: ${bluePixelCount}, Total Pixels: ${totalPixels}`
+  //     );
+  //     // Update UI with blue pixel count and percentage
+  //     bluePixelCountElement.textContent = bluePixelCount;
+  //     bluePercentageElement.textContent = (blueRatio * 100).toFixed(2) + "%";
 
-    // Update UI with blue pixel count and percentage
-    bluePixelCountElement.textContent = bluePixelCount.toLocaleString();
-    bluePercentageElement.textContent = (blueRatio * 100).toFixed(2) + "%";
+  //     // Update blue progress bar width
+  //     blueProgressBar.style.width = (blueRatio * 100).toFixed(2) + "%";
+  //   }
 
-    // Update blue progress bar width
-    blueProgressBar.style.width = (blueRatio * 100).toFixed(2) + "%";
-  }
+  //   checkBluePixels();
 
   // Function to check green pixels
-  function checkGreenPixels() {
-    let greenPixelCount = 0;
+  //   function checkGreenPixels() {
+  //     let greenPixelCount = 0;
 
-    // Get image data again
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const pixels = imageData.data;
+  //     // Get image data again
+  //     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  //     const pixels = imageData.data;
 
-    // Count green pixels
-    for (let y = 0; y < canvas.height; y++) {
-      for (let x = 0; x < canvas.width; x++) {
-        const i = (y * canvas.width + x) * 4;
-        const r = pixels[i];
-        const g = pixels[i + 1];
-        const b = pixels[i + 2];
+  //     // Count green pixels
+  //     for (let y = 0; y < canvas.height; y++) {
+  //       for (let x = 0; x < canvas.width; x++) {
+  //         const i = (y * canvas.width + x) * 4;
+  //         const r = pixels[i];
+  //         const g = pixels[i + 1];
+  //         const b = pixels[i + 2];
 
-        if (isGreenPixel(r, g, b)) {
-          greenPixelCount++;
-          console.log(greenPixelCount);
-        }
-      }
-    }
+  //         if (isGreenPixel(r, g, b)) {
+  //           greenPixelCount++;
+  //           console.log(greenPixelCount);
+  //         }
+  //       }
+  //     }
 
-    // Calculate green ratio
-    const greenRatio = greenPixelCount / totalPixels;
+  //     // Calculate green ratio
+  //     const greenRatio = greenPixelCount / totalPixels;
 
-    // Update UI with green pixel count and percentage
-    greenPixelCountElement.textContent = greenPixelCount.toLocaleString();
-    greenPercentageElement.textContent = (greenRatio * 100).toFixed(2) + "%";
-  }
+  //     // Update UI with green pixel count and percentage
+  //     greenPixelCountElement.textContent = greenPixelCount.toLocaleString();
+  //     greenPercentageElement.textContent = (greenRatio * 100).toFixed(2) + "%";
+  //   }
 
   navigator.mediaDevices
     .getUserMedia({ video: true })
