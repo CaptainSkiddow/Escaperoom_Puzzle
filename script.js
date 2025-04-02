@@ -35,10 +35,10 @@ document.addEventListener("DOMContentLoaded", () => {
   let redRatio = 0;
   let redThreshold = 150;
   let ratioThreshold = 1.5;
-  let blueThreshold = 100; // Define a threshold for blue detection
+  let blueThreshold = 100;
   let bluePixelCount = 0;
   let greenPixelCount = 0;
-  let greenThreshold = 100; // Define a threshold for green detection
+  let greenThreshold = 100;
 
   // Function to determine if a pixel is red
   function isRedPixel(r, g, b) {
@@ -78,8 +78,6 @@ document.addEventListener("DOMContentLoaded", () => {
     bluePixelCount = 0;
     greenPixelCount = 0;
     totalPixels = canvas.width * canvas.height;
-
-    currentRatio = redRatio;
 
     const sampleRate = video.width / debugCanvas.width;
 
@@ -138,7 +136,6 @@ document.addEventListener("DOMContentLoaded", () => {
     redPixelCountElement.textContent = redPixelCount.toLocaleString();
     totalPixelsElement.textContent = totalPixels.toLocaleString();
     redPercentageElement.textContent = (redRatio * 100).toFixed(2) + "%";
-    progressBar.style.width = (redRatio * 100).toFixed(2) + "%";
 
     bluePixelCountElement.textContent = bluePixelCount.toLocaleString();
     bluePercentageElement.textContent = (blueRatio * 100).toFixed(2) + "%";
@@ -147,6 +144,12 @@ document.addEventListener("DOMContentLoaded", () => {
     greenPixelCountElement.textContent = greenPixelCount.toLocaleString();
     greenPercentageElement.textContent = (greenRatio * 100).toFixed(2) + "%";
     greenProgressBar.style.width = (greenRatio * 100).toFixed(2) + "%";
+
+    progressBar.style.width = (redRatio * 100).toFixed(2) + "%";
+
+    if (redRatio > 0.6) {
+      alert("Red ratio is high: " + redRatio);
+    }
 
     requestAnimationFrame(analyzeFrame);
   }
@@ -238,6 +241,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
   const roundToNearest3 = (value) => Math.round(value / 3) * 3;
+
+  currentRatio = redRatio;
 
   function updateXPProgressBar() {
     for (let i = 0; i < XpProgressBar.length; i++) {
