@@ -17,114 +17,126 @@
       </div>
 
       <canvas id="canvas"></canvas>
+      <div class="controls_wrapper">
+        <div class="stats">
+          <div class="stat-row">
+            <strong>Red Pixels:</strong> <span id="red-pixel-count">0</span>
+          </div>
+          <div class="stat-row">
+            <strong>Total Pixels:</strong> <span id="total-pixels">0</span>
+          </div>
+          <div class="stat-row">
+            <strong>Percentage Red:</strong> <span id="red-percentage">0%</span>
+          </div>
+          <div class="stat-row">
+            <strong>Blue Pixels:</strong> <span id="blue-pixel-count">0</span>
+          </div>
+          <div class="stat-row">
+            <strong>Percentage Blue:</strong>
+            <span id="blue-percentage">0%</span>
+          </div>
+          <div class="stat-row">
+            <strong>Green Pixels:</strong> <span id="green-pixel-count">0</span>
+          </div>
+          <div class="stat-row">
+            <strong>Percentage Green:</strong>
+            <span id="green-percentage">0%</span>
+          </div>
+        </div>
 
-      <div class="stats">
-        <div class="stat-row">
-          <strong>Red Pixels:</strong> <span id="red-pixel-count">0</span>
-        </div>
-        <div class="stat-row">
-          <strong>Total Pixels:</strong> <span id="total-pixels">0</span>
-        </div>
-        <div class="stat-row">
-          <strong>Percentage Red:</strong> <span id="red-percentage">0%</span>
-        </div>
-        <div class="stat-row">
-          <strong>Blue Pixels:</strong> <span id="blue-pixel-count">0</span>
-        </div>
-        <div class="stat-row">
-          <strong>Percentage Blue:</strong> <span id="blue-percentage">0%</span>
-        </div>
-        <div class="stat-row">
-          <strong>Green Pixels:</strong> <span id="green-pixel-count">0</span>
-        </div>
-        <div class="stat-row">
-          <strong>Percentage Green:</strong>
-          <span id="green-percentage">0%</span>
-        </div>
-      </div>
-
-      <div
-        id="progress-bar-container"
-        style="
-          width: 100%;
-          background-color: #ddd;
-          height: 20px;
-          margin-top: 10px;
-        "
-      >
         <div
-          id="progress-bar"
-          style="width: 0%; height: 100%; background-color: red"
-        ></div>
+          id="progress-bar-container"
+          style="
+            width: 100%;
+            background-color: #ddd;
+            height: 20px;
+            margin-top: 10px;
+          "
+        >
+          <div
+            id="progress-bar"
+            style="width: 0%; height: 100%; background-color: red"
+          ></div>
+        </div>
+
+        <div
+          id="blue-progress-bar-container"
+          style="
+            width: 100%;
+            background-color: #ddd;
+            height: 20px;
+            margin-top: 10px;
+          "
+        >
+          <div
+            id="blue-progress-bar"
+            style="width: 0%; height: 100%; background-color: blue"
+          ></div>
+        </div>
+        <div
+          id="green-progress-bar-container"
+          style="
+            width: 100%;
+            background-color: #ddd;
+            height: 20px;
+            margin-top: 10px;
+          "
+        >
+          <div
+            id="green-progress-bar"
+            style="width: 0%; height: 100%; background-color: green"
+          ></div>
+        </div>
       </div>
 
-      <div
-        id="blue-progress-bar-container"
-        style="
-          width: 100%;
-          background-color: #ddd;
-          height: 20px;
-          margin-top: 10px;
-        "
-      >
-        <div
-          id="blue-progress-bar"
-          style="width: 0%; height: 100%; background-color: blue"
-        ></div>
-      </div>
-      <div
-        id="green-progress-bar-container"
-        style="
-          width: 100%;
-          background-color: #ddd;
-          height: 20px;
-          margin-top: 10px;
-        "
-      >
-        <div
-          id="green-progress-bar"
-          style="width: 0%; height: 100%; background-color: green"
-        ></div>
-      </div>
-
-      <div class="xp_progressbar">
-        <div class="xp_progressbar_inner">
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
-          <div class="box_green"></div>
+      <div class="xp_progressbar_wrapper">
+        <div class="windows_header">
+          <div class="windows_header_title">Windows XP</div>
+          <div class="windows_header_buttons">
+            <div class="windows_header_button"></div>
+            <div class="windows_header_button"></div>
+            <div class="windows_header_button"></div>
+          </div>
+        </div>
+        <div class="xp_progressbar">
+          <div class="xp_progressbar_inner">
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+            <div class="box_green"></div>
+          </div>
         </div>
       </div>
     </div>

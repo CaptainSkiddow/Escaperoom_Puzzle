@@ -167,11 +167,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function switchRatio() {
-      if (redCompleted) {
+      if ((redCompleted = true)) {
         currentRatio = blueRatio;
-      } else if (redCompleted && blueCompleted) {
+      } else if ((blueCompleted = true)) {
         currentRatio = greenRatio;
-      } else if (greenCompleted) {
+      } else if ((greenCompleted = true)) {
         alert("All colors completed!");
       }
     }
