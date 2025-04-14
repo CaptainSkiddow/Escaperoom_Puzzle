@@ -124,7 +124,7 @@ label {
 
 .xp_progressbar {
   width: 100%;
-  background-color: #d0000d;
+  background-color: #d0000d; /* debugging color */
   height: 2rem;
   overflow: hidden;
 }
