@@ -17,8 +17,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const totalPixelsElement = document.getElementById("total-pixels");
 
   let totalPixels = 0;
-  let ratioThreshold = 1.5;
   let defaultRatio = 0;
+  let totalCompleted = 0;
 
   // Red
   const redPixelCountElement = document.getElementById("red-pixel-count");
@@ -26,9 +26,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const redProgressBar = document.getElementById("progress-bar");
 
   let redPixelCount = 0;
-  let redThreshold = 150;
   let redRatio = 0;
-  let redCondition = 65 // Percentage for Completion
+  let redCondition = 65 / 100 // Percentage for Completion
   var redCompleted = false;
 
   // Green
@@ -37,9 +36,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const greenProgressBar = document.getElementById("green-progress-bar");
 
   let greenPixelCount = 0;
-  let greenThreshold = 30;
   let greenRatio = 0;
-  let greenCondition = 65 // Percentage for Completion
+  let greenCondition = 65 / 100 // Percentage for Completion
   var greenCompleted = false;
 
   // Blue
@@ -48,9 +46,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const blueProgressBar = document.getElementById("blue-progress-bar");
 
   let bluePixelCount = 0;
-  let blueThreshold = 100;
   let blueRatio = 0;
-  let blueCondition = 50 // Percentage for Completion
+  let blueCondition = 65 / 100 // Percentage for Completion
   var blueCompleted = false;
 
   // Windows XP Bar
@@ -80,9 +77,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const sampleRate = video.width / debugCanvas.width;
 
-    for (let x = 0; x < canvas.width; y++) {
-      for (let y = 0; y < canvas.height; x++) {
-        const i = (x * canvas.height + x) * 4;
+    for (let x = 0; x < canvas.width; x++) {
+      for (let y = 0; y < canvas.height; y++) {
+        const i = (y * canvas.width + x) * 4;
         const r = pixels[i];
         const g = pixels[i + 1];
         const b = pixels[i + 2]; // Deze values eerder in de code zetten
@@ -147,30 +144,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
     totalPixelsElement.textContent = totalPixels.toLocaleString();
 
+    // Red
     redPixelCountElement.textContent = redPixelCount.toLocaleString();
     redPercentageElement.textContent = (redRatio * 100).toFixed(2) + "%";
     redProgressBar.style.width = (redRatio * 100).toFixed(2) + "%";
 
+    // Green
     greenPixelCountElement.textContent = greenPixelCount.toLocaleString();
     greenPercentageElement.textContent = (greenRatio * 100).toFixed(2) + "%";
     greenProgressBar.style.width = (greenRatio * 100).toFixed(2) + "%";
 
+    // Blue
     bluePixelCountElement.textContent = bluePixelCount.toLocaleString();
     bluePercentageElement.textContent = (blueRatio * 100).toFixed(2) + "%";
     blueProgressBar.style.width = (blueRatio * 100).toFixed(2) + "%";
 
-    if (redRatio > redCondition / 100) {
+    if (redRatio > redCondition) {
       redCompleted = true;
+      console.log("Red completed!");
       alert("Red completed!");
     }
 
-    if (greenRatio > greenCondition / 100) {
+    if (greenRatio > greenCondition) {
       greenCompleted = true;
+      console.log("Green completed!");
       alert("Green completed!");
     }
 
-    if (blueRatio > blueCondition / 100) {
+    if (blueRatio > blueCondition) {
       blueCompleted = true;
+      console.log("Blue completed!");
       alert("Blue completed!");
     }
 
@@ -191,45 +194,63 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Function to determine if a pixel is red
   function isRedPixel(r, g, b) {
-    return r > redThreshold && r > g * ratioThreshold && r > b * ratioThreshold;
+    const isRedDominant = r > g && r > b;
+    const redDifference = r - Math.max(g, b);
+    return isRedDominant && redDifference > 20;
   }
 
   // Function to determine if a pixel is green
   function isGreenPixel(r, g, b) {
-    return g > greenThreshold && g > r * ratioThreshold && g > b * ratioThreshold
+    const isGreenDominant = g > r && g > b;
+    const greenDifference = g - Math.max(r, b);
+    return isGreenDominant && greenDifference > 20;
   }
 
   // Function to determine if a pixel is blue
   function isBluePixel(r, g, b) {
-    return b > blueThreshold && b > r * ratioThreshold && b > g * ratioThreshold
+    const isBlueDominant = b > r && b > g;
+    const blueDifference = b - Math.max(r, g);
+    return isBlueDominant && blueDifference > 20;
   }
 
-  const roundToNearest3 = (value) => Math.round(value / 3) * 3;
+  function updateXPProgressBar()
+  {
+    const numBoxes = XpProgressBar[0].children.length; // Total number of green box divs in the XP bar
+    let currentCompleted = 0;
 
-  currentRatio = redRatio;
+    if (!redCompleted) {
+      // Update progress based on red completion percentage
+      currentCompleted = Math.floor((redRatio / redCondition) * (numBoxes / 3));
+    } else if (!blueCompleted) {
+      // Update progress based on blue completion percentage
+      currentCompleted = Math.floor((blueRatio / blueCondition) * (numBoxes / 3) + (numBoxes / 3));
+    } else if (!greenCompleted) {
+      // Update progress based on green completion percentage
+      currentCompleted = Math.floor((greenRatio / greenCondition) * (numBoxes / 3) + ((2 * numBoxes) / 3));
+    }
 
-  function updateXPProgressBar() {
-    // Calculate individual contributions to the XP bar
-    const redThird = Math.min(redRatio / 0.65, 1) * (100 / 3); // Normalize to max 1
-    const blueThird = Math.min(blueRatio / 0.5, 1) * (100 / 3); // Normalize to max 1
-    const greenThird = Math.min(greenRatio / 0.65, 1) * (100 / 3); // Normalize to max 1
+    totalCompleted = Math.max(totalCompleted, currentCompleted);
 
-    // Total progress for the XP bar
-    const totalProgress = redThird + blueThird + greenThird;
+    // Update the display of the loading bar
+    const boxes = XpProgressBar[0].children;
+    for (let i = 0; i < boxes.length; i++) {
+      if (i < currentCompleted) {
+        boxes[i].style.backgroundColor = "green";
+      } else {
+        boxes[i].style.backgroundColor = "transparent"; // Empty boxes
+      }
+    }
 
-    // Update the XP bar dynamically
-    for (let i = 0; i < XpProgressBar.length; i++) {
-      XpProgressBar[i].style.width = `${roundToNearest3(totalProgress)}%`;
-
-      // Highlight XP bar when fully completed
-      if (totalProgress >= 100) {
-        XpProgressBar[i].style.backgroundColor = "gold"; // Optional: Special color on full completion
+    // Check whether all progress is complete
+    if (redCompleted && blueCompleted && greenCompleted) {
+      for (let i = 0; i < boxes.length; i++) {
+        boxes[i].style.backgroundColor = "gold"; // Entire bar turns gold
       }
     }
   }
 
-// Continue updating the XP progress bar at intervals
-  setInterval(updateXPProgressBar, 20);
+  // Call the update function periodically or after every frame processing
+  setInterval(updateXPProgressBar, 100);
 
   navigator.mediaDevices
       .getUserMedia({ video: true })
