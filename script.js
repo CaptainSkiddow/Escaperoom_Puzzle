@@ -1,29 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Screen Attributes
   const video = document.getElementById("video");
   const canvas = document.getElementById("canvas");
   const debugCanvas = document.getElementById("debug-canvas");
   const ctx = canvas.getContext("2d");
   const debugCtx = debugCanvas.getContext("2d");
-
-  const redPixelCountElement = document.getElementById("red-pixel-count");
-  const totalPixelsElement = document.getElementById("total-pixels");
-  const redPercentageElement = document.getElementById("red-percentage");
-
-  const redProgressBar = document.getElementById("progress-bar");
-
-  const bluePixelCountElement = document.getElementById("blue-pixel-count");
-  const bluePercentageElement = document.getElementById("blue-percentage");
-  const blueProgressBar = document.getElementById("blue-progress-bar");
-
-  const greenPixelCountElement = document.getElementById("green-pixel-count");
-  const greenPercentageElement = document.getElementById("green-percentage");
-  const greenProgressBar = document.getElementById("green-progress-bar");
-
-  const XpProgressBar = document.getElementsByClassName("xp_progressbar_inner");
-
-  var redCompleted = false;
-  var blueCompleted = false;
-  var greenCompleted = false;
 
   video.width = 640;
   video.height = 480;
@@ -32,36 +13,50 @@ document.addEventListener("DOMContentLoaded", () => {
   debugCanvas.width = 160;
   debugCanvas.height = 120;
 
-  let redPixelCount = 0;
+  // Total Pixels
+  const totalPixelsElement = document.getElementById("total-pixels");
+
   let totalPixels = 0;
-  let redRatio = 0;
-  let redThreshold = 150;
   let ratioThreshold = 1.5;
-  let blueThreshold = 100;
-  let bluePixelCount = 0;
+  let defaultRatio = 0;
+
+  // Red
+  const redPixelCountElement = document.getElementById("red-pixel-count");
+  const redPercentageElement = document.getElementById("red-percentage");
+  const redProgressBar = document.getElementById("progress-bar");
+
+  let redPixelCount = 0;
+  let redThreshold = 150;
+  let redRatio = 0;
+  let redCondition = 65 // Percentage for Completion
+  var redCompleted = false;
+
+  // Green
+  const greenPixelCountElement = document.getElementById("green-pixel-count");
+  const greenPercentageElement = document.getElementById("green-percentage");
+  const greenProgressBar = document.getElementById("green-progress-bar");
+
   let greenPixelCount = 0;
-  let greenThreshold = 100;
+  let greenThreshold = 30;
+  let greenRatio = 0;
+  let greenCondition = 65 // Percentage for Completion
+  var greenCompleted = false;
 
-  currentRatio = redRatio;
+  // Blue
+  const bluePixelCountElement = document.getElementById("blue-pixel-count");
+  const bluePercentageElement = document.getElementById("blue-percentage");
+  const blueProgressBar = document.getElementById("blue-progress-bar");
 
-  // Function to determine if a pixel is red
-  function isRedPixel(r, g, b) {
-    return r > redThreshold && r > g * ratioThreshold && r > b * ratioThreshold;
-  }
+  let bluePixelCount = 0;
+  let blueThreshold = 100;
+  let blueRatio = 0;
+  let blueCondition = 50 // Percentage for Completion
+  var blueCompleted = false;
 
-  // Function to determine if a pixel is blue
-  function isBluePixel(r, g, b) {
-    return (
-      b > blueThreshold && b > r * ratioThreshold && b > g * ratioThreshold
-    );
-  }
+  // Windows XP Bar
+  const XpProgressBar = document.getElementsByClassName("xp_progressbar_inner");
 
-  // Function to determine if a pixel is green
-  function isGreenPixel(r, g, b) {
-    return (
-      g > greenThreshold && g > r * ratioThreshold && g > b * ratioThreshold
-    );
-  }
+  currentRatio = defaultRatio;
 
   function analyzeFrame() {
     // Draw current video frame to canvas
@@ -85,9 +80,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const sampleRate = video.width / debugCanvas.width;
 
-    for (let y = 0; y < canvas.height; y++) {
-      for (let x = 0; x < canvas.width; x++) {
-        const i = (y * canvas.width + x) * 4;
+    for (let x = 0; x < canvas.width; y++) {
+      for (let y = 0; y < canvas.height; x++) {
+        const i = (x * canvas.height + x) * 4;
         const r = pixels[i];
         const g = pixels[i + 1];
         const b = pixels[i + 2]; // Deze values eerder in de code zetten
@@ -115,10 +110,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
           if (isRed) {
             // Highlight red pixels in bright red
-            debugPixels[debugI] = 255; // R
-            debugPixels[debugI + 1] = 0; // G
-            debugPixels[debugI + 2] = 0; // B
-            debugPixels[debugI + 3] = 0; // A
+            debugPixels[debugI] = 255;      // R
+            debugPixels[debugI + 1] = 0;    // G
+            debugPixels[debugI + 2] = 0;    // B
+            debugPixels[debugI + 3] = 255;  // A
+          }
+          if (isGreen) {
+            debugPixels[debugI] = 0;        // R
+            debugPixels[debugI + 1] = 255;  // G
+            debugPixels[debugI + 2] = 0;    // B
+            debugPixels[debugI + 3] = 255;  // A
+          }
+          if (isBlue) {
+            debugPixels[debugI] = 0;        // R
+            debugPixels[debugI + 1] = 0;    // G
+            debugPixels[debugI + 2] = 255;  // B
+            debugPixels[debugI + 3] = 255;  // A
+
           } else {
             // Show other pixels in grayscale
             const gray = (r + g + b) / 3;
@@ -134,150 +142,107 @@ document.addEventListener("DOMContentLoaded", () => {
     debugCtx.putImageData(debugImageData, 0, 0);
 
     redRatio = redPixelCount / totalPixels;
-    blueRatio = bluePixelCount / totalPixels;
     greenRatio = greenPixelCount / totalPixels;
+    blueRatio = bluePixelCount / totalPixels;
+
+    totalPixelsElement.textContent = totalPixels.toLocaleString();
 
     redPixelCountElement.textContent = redPixelCount.toLocaleString();
-    totalPixelsElement.textContent = totalPixels.toLocaleString();
     redPercentageElement.textContent = (redRatio * 100).toFixed(2) + "%";
     redProgressBar.style.width = (redRatio * 100).toFixed(2) + "%";
-
-    bluePixelCountElement.textContent = bluePixelCount.toLocaleString();
-    bluePercentageElement.textContent = (blueRatio * 100).toFixed(2) + "%";
-    blueProgressBar.style.width = (blueRatio * 100).toFixed(2) + "%";
 
     greenPixelCountElement.textContent = greenPixelCount.toLocaleString();
     greenPercentageElement.textContent = (greenRatio * 100).toFixed(2) + "%";
     greenProgressBar.style.width = (greenRatio * 100).toFixed(2) + "%";
 
-    // if (redRatio > 0.65) {
-    //   redCompleted = true;
-    //   alert("Red completed!");
-    // }
+    bluePixelCountElement.textContent = bluePixelCount.toLocaleString();
+    bluePercentageElement.textContent = (blueRatio * 100).toFixed(2) + "%";
+    blueProgressBar.style.width = (blueRatio * 100).toFixed(2) + "%";
 
-    // if (blueRatio > 0.5) {
-    //   blueCompleted = true;
-    //   alert("Blue completed!");
-    // }
-    // if (greenRatio > 0.65) {
-    //   greenCompleted = true;
-    //   alert("Green completed!");
-    // }
+    if (redRatio > redCondition / 100) {
+      redCompleted = true;
+      alert("Red completed!");
+    }
 
-    // function switchRatio() {
-    //   if ((redCompleted = true)) {
-    //     currentRatio = blueRatio;
-    //   } else if ((blueCompleted = true)) {
-    //     currentRatio = greenRatio;
-    //   } else if ((greenCompleted = true)) {
-    //     alert("All colors completed!");
-    //   }
-    // }
+    if (greenRatio > greenCondition / 100) {
+      greenCompleted = true;
+      alert("Green completed!");
+    }
 
-    // switchRatio();
+    if (blueRatio > blueCondition / 100) {
+      blueCompleted = true;
+      alert("Blue completed!");
+    }
+
+    function switchRatio() {
+      if ((redCompleted = true)) {
+        currentRatio = blueRatio;
+      } else if ((blueCompleted = true)) {
+        currentRatio = greenRatio;
+      } else if ((greenCompleted = true)) {
+        alert("All colors completed!");
+      }
+    }
+
+    switchRatio();
 
     requestAnimationFrame(analyzeFrame);
   }
 
-  //   function checkBluePixels() {
-  //     let bluePixelCount = 0;
+  // Function to determine if a pixel is red
+  function isRedPixel(r, g, b) {
+    return r > redThreshold && r > g * ratioThreshold && r > b * ratioThreshold;
+  }
 
-  //     // Get image data
-  //     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  //     const pixels = imageData.data;
+  // Function to determine if a pixel is green
+  function isGreenPixel(r, g, b) {
+    return g > greenThreshold && g > r * ratioThreshold && g > b * ratioThreshold
+  }
 
-  //     // Count blue pixels
-  //     for (let y = 0; y < canvas.height; y++) {
-  //       for (let x = 0; x < canvas.width; x++) {
-  //         const i = (y * canvas.width + x) * 4;
-  //         const r = pixels[i];
-  //         const g = pixels[i + 1];
-  //         const b = pixels[i + 2];
-
-  //         if (isBluePixel(r, g, b)) {
-  //           bluePixelCount++;
-  //           console.log(
-  //             `Blue Pixel Detected at (${x}, ${y}): R=${r}, G=${g}, B=${b}`
-  //           );
-  //         }
-  //       }
-  //     }
-
-  //     // Calculate blue ratio
-  //     const blueRatio = bluePixelCount / totalPixels;
-
-  //     console.log(
-  //       `Blue Pixel Count: ${bluePixelCount}, Total Pixels: ${totalPixels}`
-  //     );
-  //     // Update UI with blue pixel count and percentage
-  //     bluePixelCountElement.textContent = bluePixelCount;
-  //     bluePercentageElement.textContent = (blueRatio * 100).toFixed(2) + "%";
-
-  //     // Update blue progress bar width
-  //     blueProgressBar.style.width = (blueRatio * 100).toFixed(2) + "%";
-  //   }
-
-  //   checkBluePixels();
-
-  // Function to check green pixels
-  //   function checkGreenPixels() {
-  //     let greenPixelCount = 0;
-
-  //     // Get image data again
-  //     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  //     const pixels = imageData.data;
-
-  //     // Count green pixels
-  //     for (let y = 0; y < canvas.height; y++) {
-  //       for (let x = 0; x < canvas.width; x++) {
-  //         const i = (y * canvas.width + x) * 4;
-  //         const r = pixels[i];
-  //         const g = pixels[i + 1];
-  //         const b = pixels[i + 2];
-
-  //         if (isGreenPixel(r, g, b)) {
-  //           greenPixelCount++;
-  //           console.log(greenPixelCount);
-  //         }
-  //       }
-  //     }
-
-  //     // Calculate green ratio
-  //     const greenRatio = greenPixelCount / totalPixels;
-
-  //     // Update UI with green pixel count and percentage
-  //     greenPixelCountElement.textContent = greenPixelCount.toLocaleString();
-  //     greenPercentageElement.textContent = (greenRatio * 100).toFixed(2) + "%";
-  //   }
-
-  navigator.mediaDevices
-    .getUserMedia({ video: true })
-    .then((stream) => {
-      video.srcObject = stream;
-      video.play();
-
-      video.onloadedmetadata = () => {
-        analyzeFrame();
-      };
-    })
-    .catch((error) => {
-      console.error("Error accessing webcam:", error);
-      alert("Error accessing webcam: " + error.message);
-    });
+  // Function to determine if a pixel is blue
+  function isBluePixel(r, g, b) {
+    return b > blueThreshold && b > r * ratioThreshold && b > g * ratioThreshold
+  }
 
   const roundToNearest3 = (value) => Math.round(value / 3) * 3;
 
   currentRatio = redRatio;
 
   function updateXPProgressBar() {
+    // Calculate individual contributions to the XP bar
+    const redThird = Math.min(redRatio / 0.65, 1) * (100 / 3); // Normalize to max 1
+    const blueThird = Math.min(blueRatio / 0.5, 1) * (100 / 3); // Normalize to max 1
+    const greenThird = Math.min(greenRatio / 0.65, 1) * (100 / 3); // Normalize to max 1
+
+    // Total progress for the XP bar
+    const totalProgress = redThird + blueThird + greenThird;
+
+    // Update the XP bar dynamically
     for (let i = 0; i < XpProgressBar.length; i++) {
-      if (typeof currentRatio !== "undefined") {
-        XpProgressBar[i].style.width =
-          roundToNearest3(currentRatio * 100) + "%";
-      } else {
+      XpProgressBar[i].style.width = `${roundToNearest3(totalProgress)}%`;
+
+      // Highlight XP bar when fully completed
+      if (totalProgress >= 100) {
+        XpProgressBar[i].style.backgroundColor = "gold"; // Optional: Special color on full completion
       }
     }
   }
 
+// Continue updating the XP progress bar at intervals
   setInterval(updateXPProgressBar, 20);
+
+  navigator.mediaDevices
+      .getUserMedia({ video: true })
+      .then((stream) => {
+        video.srcObject = stream;
+        video.play();
+
+        video.onloadedmetadata = () => {
+          analyzeFrame();
+        };
+      })
+      .catch((error) => {
+        console.error("Error accessing webcam:", error);
+        alert("Error accessing webcam: " + error.message);
+      });
 });
