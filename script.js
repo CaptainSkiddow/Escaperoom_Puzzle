@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let greenPixelCount = 0;
   let greenThreshold = 100;
 
-  let currentRatio = redRatio;
+  currentRatio = redRatio;
 
   // Function to determine if a pixel is red
   function isRedPixel(r, g, b) {
@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const i = (y * canvas.width + x) * 4;
         const r = pixels[i];
         const g = pixels[i + 1];
-        const b = pixels[i + 2];
+        const b = pixels[i + 2]; // Deze values eerder in de code zetten
 
         const isRed = isRedPixel(r, g, b);
         if (isRed) {
@@ -150,33 +150,31 @@ document.addEventListener("DOMContentLoaded", () => {
     greenPercentageElement.textContent = (greenRatio * 100).toFixed(2) + "%";
     greenProgressBar.style.width = (greenRatio * 100).toFixed(2) + "%";
 
-    currentRatio = redRatio;
+    // if (redRatio > 0.65) {
+    //   redCompleted = true;
+    //   alert("Red completed!");
+    // }
 
-    if (redRatio > 0.65) {
-      redCompleted = true;
-      alert("Red completed!");
-    }
+    // if (blueRatio > 0.5) {
+    //   blueCompleted = true;
+    //   alert("Blue completed!");
+    // }
+    // if (greenRatio > 0.65) {
+    //   greenCompleted = true;
+    //   alert("Green completed!");
+    // }
 
-    if (blueRatio > 0.5) {
-      blueCompleted = true;
-      alert("Blue completed!");
-    }
-    if (greenRatio > 0.65) {
-      greenCompleted = true;
-      alert("Green completed!");
-    }
+    // function switchRatio() {
+    //   if ((redCompleted = true)) {
+    //     currentRatio = blueRatio;
+    //   } else if ((blueCompleted = true)) {
+    //     currentRatio = greenRatio;
+    //   } else if ((greenCompleted = true)) {
+    //     alert("All colors completed!");
+    //   }
+    // }
 
-    function switchRatio() {
-      if ((redCompleted = true)) {
-        currentRatio = blueRatio;
-      } else if ((blueCompleted = true)) {
-        currentRatio = greenRatio;
-      } else if ((greenCompleted = true)) {
-        alert("All colors completed!");
-      }
-    }
-
-    switchRatio();
+    // switchRatio();
 
     requestAnimationFrame(analyzeFrame);
   }
@@ -268,6 +266,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
   const roundToNearest3 = (value) => Math.round(value / 3) * 3;
+
+  currentRatio = redRatio;
 
   function updateXPProgressBar() {
     for (let i = 0; i < XpProgressBar.length; i++) {
