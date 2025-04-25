@@ -204,19 +204,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!redCompleted) {
       // Update progress based on red completion percentage
-      if (redRatio >= 0.01) {
-        currentCompleted = Math.floor((redRatio / redCondition) * (numBoxes / 3));
-      }
+      currentCompleted = Math.floor((redRatio / redCondition) * (numBoxes / 3));
     } else if (!blueCompleted) {
       // Update progress based on blue completion percentage
-      if (blueRatio >= 0.01) {
-        currentCompleted = Math.floor((blueRatio / blueCondition) * (numBoxes / 3) + (numBoxes / 3));
-      }
+      currentCompleted = Math.floor((blueRatio / blueCondition) * (numBoxes / 3) + (numBoxes / 3));
     } else if (!greenCompleted) {
       // Update progress based on green completion percentage
-      if (greenRatio >= 0.01) {
-        currentCompleted = Math.floor((greenRatio / greenCondition) * (numBoxes / 3) + ((2 * numBoxes) / 3));
-      }
+      currentCompleted = Math.floor((greenRatio / greenCondition) * (numBoxes / 3) + ((2 * numBoxes) / 3));
     }
 
     totalCompleted = Math.max(totalCompleted, currentCompleted);
