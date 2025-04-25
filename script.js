@@ -52,6 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Windows XP Bar
   const XpProgressBar = document.getElementsByClassName("xp_progressbar_inner");
+  const numBoxes = XpProgressBar[0].children.length; // Total number of green box divs in the XP bar
 
   currentRatio = defaultRatio;
 
@@ -106,24 +107,20 @@ document.addEventListener("DOMContentLoaded", () => {
           const debugI = (debugY * debugCanvas.width + debugX) * 4;
 
           if (isRed) {
-            // Highlight red pixels in bright red
             debugPixels[debugI] = 255;      // R
             debugPixels[debugI + 1] = 0;    // G
             debugPixels[debugI + 2] = 0;    // B
             debugPixels[debugI + 3] = 255;  // A
-          }
-          if (isGreen) {
+          } else if (isGreen) {
             debugPixels[debugI] = 0;        // R
             debugPixels[debugI + 1] = 255;  // G
             debugPixels[debugI + 2] = 0;    // B
             debugPixels[debugI + 3] = 255;  // A
-          }
-          if (isBlue) {
+          } else if (isBlue) {
             debugPixels[debugI] = 0;        // R
             debugPixels[debugI + 1] = 0;    // G
             debugPixels[debugI + 2] = 255;  // B
             debugPixels[debugI + 3] = 255;  // A
-
           } else {
             // Show other pixels in grayscale
             const gray = (r + g + b) / 3;
@@ -177,18 +174,6 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("Blue completed!");
     }
 
-    function switchRatio() {
-      if ((redCompleted = true)) {
-        currentRatio = blueRatio;
-      } else if ((blueCompleted = true)) {
-        currentRatio = greenRatio;
-      } else if ((greenCompleted = true)) {
-        alert("All colors completed!");
-      }
-    }
-
-    switchRatio();
-
     requestAnimationFrame(analyzeFrame);
   }
 
@@ -215,18 +200,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateXPProgressBar()
   {
-    const numBoxes = XpProgressBar[0].children.length; // Total number of green box divs in the XP bar
     let currentCompleted = 0;
 
     if (!redCompleted) {
       // Update progress based on red completion percentage
-      currentCompleted = Math.floor((redRatio / redCondition) * (numBoxes / 3));
+      if (redRatio >= 0.01) {
+        currentCompleted = Math.floor((redRatio / redCondition) * (numBoxes / 3));
+      }
     } else if (!blueCompleted) {
       // Update progress based on blue completion percentage
-      currentCompleted = Math.floor((blueRatio / blueCondition) * (numBoxes / 3) + (numBoxes / 3));
+      if (blueRatio >= 0.01) {
+        currentCompleted = Math.floor((blueRatio / blueCondition) * (numBoxes / 3) + (numBoxes / 3));
+      }
     } else if (!greenCompleted) {
       // Update progress based on green completion percentage
-      currentCompleted = Math.floor((greenRatio / greenCondition) * (numBoxes / 3) + ((2 * numBoxes) / 3));
+      if (greenRatio >= 0.01) {
+        currentCompleted = Math.floor((greenRatio / greenCondition) * (numBoxes / 3) + ((2 * numBoxes) / 3));
+      }
     }
 
     totalCompleted = Math.max(totalCompleted, currentCompleted);
